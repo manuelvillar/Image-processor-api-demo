@@ -34,12 +34,28 @@ export function createApp(config: AppConfig): Express {
   });
 
   // Health check endpoint
-  app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    });
+  app.get('/health', async (_req: Request, res: Response) => {
+    try {
+      const mongoHealth = await import('./infra/mongo.js').then(m => m.checkMongoHealth());
+      
+      res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        services: {
+          server: 'ok',
+          database: mongoHealth.status,
+          ...(mongoHealth.status === 'error' && { databaseError: mongoHealth.message })
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 'error',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   });
 
   // 404 handler - catch all unmatched routes

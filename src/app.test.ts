@@ -20,6 +20,9 @@ describe('App', () => {
       expect(response.body).toHaveProperty('status', 'ok');
       expect(response.body).toHaveProperty('timestamp');
       expect(response.body).toHaveProperty('uptime');
+      expect(response.body).toHaveProperty('services');
+      expect(response.body.services).toHaveProperty('server', 'ok');
+      expect(response.body.services).toHaveProperty('database');
     });
   });
 

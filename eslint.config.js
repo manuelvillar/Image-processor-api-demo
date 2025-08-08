@@ -17,6 +17,9 @@ export default [
         jest: 'readonly',
         global: 'readonly',
         console: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly',
+        require: 'readonly',
       },
     },
     plugins: {

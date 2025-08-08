@@ -12,21 +12,25 @@ Build a REST API that:
 
 ## Current Status
 
-**Step 0 Complete**: Project initialization with TypeScript, Express, and testing infrastructure.
+**Step 1 Complete**: Docker & MongoDB setup with connection infrastructure.
 
 ✅ **Completed Features:**
 - Express.js server with security middleware (helmet, cors, morgan)
-- Health check endpoint (`GET /health`)
+- Health check endpoint (`GET /health`) with MongoDB status
 - Centralized error handling and 404 responses
 - TypeScript configuration with NodeNext ES modules
 - Testing infrastructure with Vitest
 - Code quality tools (ESLint, Prettier)
 - Development environment with hot reload
 - Production build system
+- **NEW**: Docker Compose setup for MongoDB
+- **NEW**: MongoDB connection with retry logic
+- **NEW**: Configuration management with environment variables
+- **NEW**: Database health monitoring
+- **NEW**: Graceful shutdown with MongoDB disconnection
 
 🔄 **Next Steps:**
-- Step 1: Docker & MongoDB setup
-- Step 2: Database models and connection
+- Step 2: Database models and validation
 - Step 3: Image processing with Sharp
 - Step 4: Task management endpoints
 - Step 5: API documentation and testing
@@ -35,10 +39,12 @@ Build a REST API that:
 
 - **Node.js** + **TypeScript** (ES2022, NodeNext modules)
 - **Express.js** web framework
+- **MongoDB** with Mongoose ODM
 - **Vitest** for testing (ES module compatible)
 - **ESLint** + **Prettier** for code quality
 - **Pino** for structured logging
 - **tsx** for development with hot reload
+- **Docker** for MongoDB containerization
 
 ## Project Structure
 
@@ -46,11 +52,13 @@ Build a REST API that:
 src/
 ├── app.ts              # Express app factory with middleware
 ├── server.ts           # Server bootstrap and graceful shutdown
+├── config/
+│   └── index.ts        # Configuration management and validation
+├── infra/
+│   └── mongo.ts        # MongoDB connection and health monitoring
 ├── test/
 │   └── setup.ts        # Test configuration and global setup
-├── config/             # Configuration management (coming soon)
 ├── common/             # Shared utilities (coming soon)
-├── infra/              # Infrastructure (coming soon)
 └── modules/            # Feature modules (coming soon)
 ```
 
@@ -59,6 +67,7 @@ src/
 ### Prerequisites
 
 - Node.js 18+
+- Docker and Docker Compose
 - npm or yarn
 
 ### Installation
@@ -69,12 +78,17 @@ src/
    npm install
    ```
 
-3. Start development server:
+3. Start MongoDB with Docker:
+   ```bash
+   docker compose up -d
+   ```
+
+4. Start development server:
    ```bash
    npm run dev
    ```
 
-4. Verify the server is running:
+5. Verify the server is running:
    ```bash
    curl http://localhost:3000/health
    ```
@@ -84,7 +98,11 @@ src/
 {
   "status": "ok",
   "timestamp": "2025-08-08T10:16:30.492Z",
-  "uptime": 138.925530083
+"uptime": 138.925530083,
+  "services": {
+    "server": "ok",
+    "database": "ok"
+  }
 }
 ```
 
@@ -116,7 +134,11 @@ src/
 {
   "status": "ok",
   "timestamp": "2025-08-08T10:16:30.492Z",
-  "uptime": 138.925530083
+  "uptime": 138.925530083,
+  "services": {
+    "server": "ok",
+    "database": "ok"
+  }
 }
 ```
 
@@ -129,9 +151,21 @@ src/
 Create a `.env` file with:
 
 ```env
+# Server Configuration
 PORT=3000
 NODE_ENV=development
 LOG_LEVEL=info
+
+# MongoDB Configuration
+MONGO_URI=mongodb://admin:password@localhost:27017/image_processor?authSource=admin
+MONGO_DB_NAME=image_processor
+
+# File System Configuration
+OUTPUT_DIR=./output
+TMP_DIR=./temp
+
+# Image Processing Configuration
+MAX_DOWNLOAD_MB=25
 ```
 
 For testing, create a `.env.test` file:

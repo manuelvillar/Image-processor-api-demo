@@ -1,8 +1,13 @@
 import pino from 'pino';
 import { createApp, AppConfig } from './app.js';
+import { mongoConnection } from './infra/mongo.js';
+import { appConfig, validateConfig } from './config/index.js';
+
+// Validate configuration before starting
+validateConfig();
 
 const logger = pino({
-  level: process.env['LOG_LEVEL'] || 'info',
+  level: appConfig.logLevel,
   transport: {
     target: 'pino-pretty',
     options: {
@@ -12,32 +17,47 @@ const logger = pino({
 });
 
 const config: AppConfig = {
-  port: parseInt(process.env['PORT'] || '3000', 10),
+  port: appConfig.port,
   logger,
 };
 
 const app = createApp(config);
 
-const server = app.listen(config.port, () => {
-  logger.info(`Server running on port ${config.port}`);
-  logger.info(`Health check available at http://localhost:${config.port}/health`);
-});
+// Initialize MongoDB connection
+async function startServer(): Promise<void> {
+  try {
+    // Connect to MongoDB
+    await mongoConnection.connect();
+    logger.info('MongoDB connected successfully');
+    
+    // Start the server
+    const server = app.listen(config.port, () => {
+      logger.info(`Server running on port ${config.port}`);
+      logger.info(`Health check available at http://localhost:${config.port}/health`);
+    });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
-  });
-});
+    // Graceful shutdown
+    process.on('SIGTERM', async () => {
+      logger.info('SIGTERM received, shutting down gracefully');
+      server.close(async () => {
+        await mongoConnection.disconnect();
+        logger.info('Process terminated');
+        process.exit(0);
+      });
+    });
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
-  });
-});
+    process.on('SIGINT', async () => {
+      logger.info('SIGINT received, shutting down gracefully');
+      server.close(async () => {
+        await mongoConnection.disconnect();
+        logger.info('Process terminated');
+        process.exit(0);
+      });
+    });
+  } catch (error) {
+    logger.error(`Failed to start server: ${(error as Error).message}`);
+    process.exit(1);
+  }
+}
 
-export default server; 
+startServer(); 
