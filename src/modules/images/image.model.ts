@@ -17,12 +17,10 @@ const ImageSchema = new Schema<IImage>(
     taskId: {
       type: String,
       required: true,
-      index: true,
     },
     resolution: {
       type: String,
       required: true,
-      index: true,
     },
     path: {
       type: String,
@@ -31,7 +29,6 @@ const ImageSchema = new Schema<IImage>(
     md5: {
       type: String,
       required: true,
-      index: true,
     },
     createdAt: {
       type: Date,
