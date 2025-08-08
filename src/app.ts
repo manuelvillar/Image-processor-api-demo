@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import pino from 'pino';
+import { errorHandler } from './common/errors.js';
 
 export interface AppConfig {
   port: number;
@@ -67,14 +68,7 @@ export function createApp(config: AppConfig): Express {
   });
 
   // Global error handler
-  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    config.logger.error(err, 'Unhandled error');
-    
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: process.env['NODE_ENV'] === 'development' ? err.message : 'Something went wrong',
-    });
-  });
+  app.use(errorHandler);
 
   return app;
 } 
