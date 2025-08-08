@@ -12,7 +12,7 @@ Build a REST API that:
 
 ## Current Status
 
-**Step 1 Complete**: Docker & MongoDB setup with connection infrastructure.
+**Step 2 Complete**: Database models and validation infrastructure.
 
 ✅ **Completed Features:**
 - Express.js server with security middleware (helmet, cors, morgan)
@@ -28,9 +28,12 @@ Build a REST API that:
 - **NEW**: Configuration management with environment variables
 - **NEW**: Database health monitoring
 - **NEW**: Graceful shutdown with MongoDB disconnection
+- **NEW**: Mongoose models for Tasks and Images
+- **NEW**: Zod validation schemas for request validation
+- **NEW**: Custom error classes for consistent error handling
+- **NEW**: Type-safe database operations
 
 🔄 **Next Steps:**
-- Step 2: Database models and validation
 - Step 3: Image processing with Sharp
 - Step 4: Task management endpoints
 - Step 5: API documentation and testing
@@ -56,10 +59,16 @@ src/
 │   └── index.ts        # Configuration management and validation
 ├── infra/
 │   └── mongo.ts        # MongoDB connection and health monitoring
-├── test/
-│   └── setup.ts        # Test configuration and global setup
-├── common/             # Shared utilities (coming soon)
-└── modules/            # Feature modules (coming soon)
+├── common/
+│   ├── errors.ts       # Custom error classes and error handling
+│   └── validation.ts   # Zod validation schemas and middleware
+├── modules/
+│   ├── tasks/
+│   │   └── task.model.ts # Task Mongoose model and schema
+│   └── images/
+│       └── image.model.ts # Image Mongoose model and schema
+└── test/
+    └── setup.ts        # Test configuration and global setup
 ```
 
 ## Quick Start
