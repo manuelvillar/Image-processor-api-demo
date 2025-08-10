@@ -5,8 +5,8 @@ import { fileService } from '../images/file.service.js';
 import { NotFoundError, ProcessingError, ValidationError } from '../../common/errors.js';
 
 export interface CreateTaskRequest {
-  imageUrl?: string;
-  imageFile?: any; // Will be Express.Multer.File when we add multer
+  imageUrl?: string | undefined;
+  imageFile?: any | undefined; // Will be Express.Multer.File when we add multer
 }
 
 export interface TaskResult {
@@ -37,14 +37,13 @@ export class TaskService {
       const price = this.generateRandomPrice();
 
       // Create task record
-      const task = new Task({
+      const taskData = {
         taskId,
         status: 'pending',
         price,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
+      };
+      
+      const task = new Task(taskData);
       await task.save();
 
       // Process image asynchronously
@@ -186,9 +185,11 @@ export class TaskService {
    * Generate unique task ID
    */
   private generateTaskId(): string {
-    const timestamp = Date.now().toString(36);
+    const timestamp = Date.now();
+    const date = new Date(timestamp);
+    const dateStr = date.toISOString().slice(0, 19).replace(/[-:T]/g, '');
     const random = Math.random().toString(36).substring(2, 8);
-    return `task_${timestamp}_${random}`;
+    return `task_${dateStr}_${random}`;
   }
 
   /**

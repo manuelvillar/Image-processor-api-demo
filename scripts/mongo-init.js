@@ -9,7 +9,7 @@ db.createCollection('tasks', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['taskId', 'status', 'price', 'originalPath', 'createdAt'],
+      required: ['taskId', 'status', 'price'],
       properties: {
         taskId: {
           bsonType: 'string',

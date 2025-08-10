@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import pino from 'pino';
 import { errorHandler } from './common/errors.js';
+import taskRoutes from './modules/tasks/task.routes.js';
 
 export interface AppConfig {
   port: number;
@@ -58,6 +59,9 @@ export function createApp(config: AppConfig): Express {
       });
     }
   });
+
+  // API routes
+  app.use('/tasks', taskRoutes);
 
   // 404 handler - catch all unmatched routes
   app.use((req: Request, res: Response) => {

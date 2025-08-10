@@ -29,8 +29,18 @@ export const PathSchema = z.string().min(1, 'Path is required');
 
 // Request schemas
 export const CreateTaskRequestSchema = z.object({
-  source: z.string().min(1, 'Source path or URL is required'),
-});
+  imageUrl: z.url('Invalid URL format').optional(),
+  imageFile: z.string().min(1, 'File path is required').optional(),
+}).refine(
+  (data) => data.imageUrl || data.imageFile,
+  {
+    message: 'Either imageUrl or imageFile must be provided',
+    path: ['imageUrl'], // This will show the error on the imageUrl field
+  }
+).transform((data) => ({
+  imageUrl: data.imageUrl || undefined,
+  imageFile: data.imageFile || undefined,
+}));
 
 export const GetTaskResponseSchema = z.object({
   taskId: TaskIdSchema,

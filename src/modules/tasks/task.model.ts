@@ -42,7 +42,7 @@ const TaskSchema = new Schema<ITask>(
     },
     originalPath: {
       type: String,
-      required: true,
+      required: false, // Will be set after file download/upload
     },
     completedAt: {
       type: Date,
