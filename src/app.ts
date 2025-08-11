@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import pino from 'pino';
 import { errorHandler } from './common/errors.js';
 import taskRoutes from './modules/tasks/task.routes.js';
+import swaggerUi from 'swagger-ui-express';
+import { specs, swaggerUiOptions } from './common/swagger.js';
 
 export interface AppConfig {
   port: number;
@@ -35,7 +37,27 @@ export function createApp(config: AppConfig): Express {
     next();
   });
 
-  // Health check endpoint
+  /**
+   * @swagger
+   * /health:
+   *   get:
+   *     summary: Get server health status and uptime
+   *     description: Get server health status, uptime, and database connection status
+   *     tags: [Health]
+   *     responses:
+   *       200:
+   *         description: Server health information
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/HealthResponse'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   app.get('/health', async (_req: Request, res: Response) => {
     try {
       const mongoHealth = await import('./infra/mongo.js').then(m => m.checkMongoHealth());
@@ -58,6 +80,13 @@ export function createApp(config: AppConfig): Express {
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
+  });
+
+  // API Documentation
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
+  app.get('/api-docs.json', (_req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
   });
 
   // API routes

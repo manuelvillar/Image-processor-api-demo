@@ -12,8 +12,37 @@ export class TaskController {
   }
 
   /**
-   * Create a new image processing task
-   * POST /tasks
+   * @swagger
+   * /tasks:
+   *   post:
+   *     summary: Create a new image processing task
+   *     description: Create a new image processing task with URL or file
+   *     tags: [Tasks]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateTaskRequest'
+   *     responses:
+   *       201:
+   *         description: Task created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/CreateTaskResponse'
+   *       400:
+   *         description: Invalid request data
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   async createTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -51,8 +80,39 @@ export class TaskController {
   }
 
   /**
-   * Get task status and results by ID
-   * GET /tasks/:taskId
+   * @swagger
+   * /tasks/{taskId}:
+   *   get:
+   *     summary: Get task status and results by ID
+   *     description: Get task status, price, and results by task ID
+   *     tags: [Tasks]
+   *     parameters:
+   *       - in: path
+   *         name: taskId
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Task ID
+   *         example: task_20250811115246_ipgdc3
+   *     responses:
+   *       200:
+   *         description: Task found successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GetTaskResponse'
+   *       404:
+   *         description: Task not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   async getTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

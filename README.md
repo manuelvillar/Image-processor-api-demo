@@ -12,7 +12,7 @@ Build a REST API that:
 
 ## Current Status
 
-**Step 4 In Progress**: Task management service and business logic.
+**Step 5 Complete**: API documentation with OpenAPI/Swagger.
 
 ✅ **Completed Features:**
 - Express.js server with security middleware (helmet, cors, morgan)
@@ -45,10 +45,13 @@ Build a REST API that:
 - **NEW**: Unique task ID generation
 - **NEW**: Status management (pending → completed/failed)
 - **NEW**: Comprehensive task service tests
+- **NEW**: OpenAPI/Swagger documentation
+- **NEW**: Interactive API documentation UI
 
 🔄 **Next Steps:**
-- Step 4: Task management API endpoints
-- Step 5: API documentation and testing
+- Step 6: Integration testing with real data
+- Step 7: File upload functionality
+- Step 8: Production deployment setup
 
 ## Tech Stack
 
@@ -152,6 +155,13 @@ src/
 
 ## API Endpoints
 
+## API Documentation
+
+The API is fully documented with OpenAPI/Swagger:
+
+- **Interactive Documentation**: http://localhost:3000/api-docs
+- **OpenAPI JSON**: http://localhost:3000/api-docs.json
+
 ### Health Check
 - `GET /health` - Server health status with uptime
 
@@ -168,17 +178,18 @@ src/
 }
 ```
 
-### Tasks (In Development)
+### Tasks API
 - `POST /tasks` - Create a new image processing task
 - `GET /tasks/:id` - Get task status and results
 
-**Business Logic Ready:**
+**Features:**
 - ✅ Task creation with validation
 - ✅ Task retrieval by ID
 - ✅ Asynchronous image processing
 - ✅ Random price generation (5-50)
 - ✅ Status management (pending → completed/failed)
 - ✅ Error handling and cleanup
+- ✅ OpenAPI documentation
 
 ## Environment Variables
 
