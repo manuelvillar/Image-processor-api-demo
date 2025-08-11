@@ -27,6 +27,18 @@ export function createApp(config: AppConfig): Express {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
 
+  // JSON parsing error handler
+  app.use((error: Error, _req: Request, res: Response, next: NextFunction): void => {
+    if (error instanceof SyntaxError && 'body' in error) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Invalid JSON format',
+      });
+      return;
+    }
+    next(error);
+  });
+
   // Request logging
   app.use((req: Request, _res: Response, next: NextFunction) => {
     config.logger.info({

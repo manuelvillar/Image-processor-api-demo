@@ -71,9 +71,11 @@ export function formatErrorResponse(error: Error): {
 }
 
 // Error handler middleware
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
-export function errorHandler(error: Error, _req: Request, res: Response): Response | void {
+export function errorHandler(error: Error, _req: Request, res: Response, _next: NextFunction): Response {
+  // Suppress unused parameter warning
+  void _next;
   // Log the error (using console for error logging is acceptable)
   // eslint-disable-next-line no-console
   console.error('Error:', error);

@@ -30,11 +30,21 @@ export const PathSchema = z.string().min(1, 'Path is required');
 // Request schemas
 export const CreateTaskRequestSchema = z.object({
   imageUrl: z.url('Invalid URL format').optional(),
-  imageFile: z.string().min(1, 'File path is required').optional(),
+  imageFile: z.string().min(1, 'File data is required').optional(),
 }).refine(
-  (data) => data.imageUrl || data.imageFile,
+  (data) => {
+    // Check if at least one is provided
+    if (!data.imageUrl && !data.imageFile) {
+      return false;
+    }
+    // Check that not both are provided
+    if (data.imageUrl && data.imageFile) {
+      return false;
+    }
+    return true;
+  },
   {
-    message: 'Either imageUrl or imageFile must be provided',
+    message: 'Either imageUrl or imageFile must be provided, but not both',
     path: ['imageUrl'], // This will show the error on the imageUrl field
   }
 ).transform((data) => ({
