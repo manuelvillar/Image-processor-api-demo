@@ -2,16 +2,11 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import pino from 'pino';
 import { errorHandler } from './common/errors.js';
 import taskRoutes from './modules/tasks/task.routes.js';
 import swaggerUi from 'swagger-ui-express';
 import { specs, swaggerUiOptions } from './common/swagger.js';
-
-export interface AppConfig {
-  port: number;
-  logger: pino.Logger;
-}
+import type { AppConfig } from './types/index.js';
 
 export function createApp(config: AppConfig): Express {
   const app = express();

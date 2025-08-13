@@ -1,16 +1,5 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
-
-export interface IImage extends Document {
-  taskId: string;
-  resolution: string;
-  path: string;
-  md5: string;
-  createdAt: Date;
-}
-
-export interface IImageModel extends Model<IImage> {
-  // Custom static methods can be added here later
-}
+import mongoose, { Schema } from 'mongoose';
+import type { IImage, IImageModel } from '../../types/index.js';
 
 const ImageSchema = new Schema<IImage>(
   {

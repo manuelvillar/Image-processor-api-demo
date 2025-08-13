@@ -1,16 +1,6 @@
 import { z, ZodError } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 
-// Extend Request interface to include validatedData
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      validatedData?: unknown;
-    }
-  }
-}
-
 // Base schemas
 export const TaskIdSchema = z.string().min(1, 'Task ID is required');
 
@@ -101,7 +91,4 @@ export function validate<T extends z.ZodTypeAny>(
   };
 }
 
-// Type exports
-export type CreateTaskRequest = z.infer<typeof CreateTaskRequestSchema>;
-export type GetTaskResponse = z.infer<typeof GetTaskResponseSchema>;
-export type Image = z.infer<typeof ImageSchema>;
+

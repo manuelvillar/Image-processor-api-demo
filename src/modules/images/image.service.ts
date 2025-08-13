@@ -4,21 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { appConfig } from '../../config/index.js';
 import { FileSystemError, ProcessingError } from '../../common/errors.js';
-
-export interface ImageProcessingOptions {
-  width: number;
-  quality?: number;
-  format?: 'jpeg' | 'png' | 'webp';
-}
-
-export interface ProcessedImage {
-  resolution: string;
-  path: string;
-  md5: string;
-  size: number;
-  width: number;
-  height: number;
-}
+import type { ProcessedImage } from '../../types/index.js';
 
 export class ImageService {
   private readonly outputDir: string;

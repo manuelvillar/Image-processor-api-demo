@@ -78,20 +78,14 @@ describe('TaskService', () => {
       await expect(taskService.createTask(request)).rejects.toThrow('Either imageUrl or imageFile must be provided');
     });
 
-    it('should accept request with both imageUrl and imageFile', async () => {
-      const mockTask = createMockTask();
-      (Task as any).mockImplementation(() => mockTask);
-
+    it('should reject request with both imageUrl and imageFile', async () => {
       const request = { 
         imageUrl: 'https://example.com/image.jpg',
-        imageFile: { buffer: Buffer.from('test'), mimetype: 'image/jpeg' }
+        imageFile: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD'
       };
 
-      const result = await taskService.createTask(request);
-      
-      // Should work as we only validate that at least one is provided
-      expect(result.taskId).toBe('task_123');
-      expect(result.status).toBe('pending');
+      // Should fail validation because both imageUrl and imageFile are provided
+      await expect(taskService.createTask(request)).rejects.toThrow('Failed to create task: Either imageUrl or imageFile must be provided, but not both');
     });
 
     it('should handle database save errors', async () => {

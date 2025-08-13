@@ -1,25 +1,9 @@
-import { Task, ITask } from './task.model.js';
-import { Image, IImage } from '../images/image.model.js';
+import { Task } from './task.model.js';
+import { Image } from '../images/image.model.js';
 import { imageService } from '../images/image.service.js';
 import { fileService } from '../images/file.service.js';
 import { NotFoundError, ProcessingError, ValidationError } from '../../common/errors.js';
-
-export interface CreateTaskRequest {
-  imageUrl?: string | undefined;
-  imageFile?: any | undefined; // Will be Express.Multer.File when we add multer
-}
-
-export interface TaskResult {
-  taskId: string;
-  status: 'pending' | 'completed' | 'failed';
-  price: number;
-  originalPath?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  completedAt?: Date | undefined;
-  error?: string | undefined;
-  images?: IImage[] | undefined;
-}
+import type { CreateTaskRequest, TaskResult, ITask, IImage } from '../../types/index.js';
 
 export class TaskService {
   /**
@@ -30,6 +14,10 @@ export class TaskService {
       // Validate request
       if (!request.imageUrl && !request.imageFile) {
         throw new ValidationError('Either imageUrl or imageFile must be provided');
+      }
+      
+      if (request.imageUrl && request.imageFile) {
+        throw new ValidationError('Either imageUrl or imageFile must be provided, but not both');
       }
 
       // Generate task ID and price
@@ -212,7 +200,12 @@ export class TaskService {
       updatedAt: task.updatedAt,
       completedAt: task.completedAt || undefined,
       error: task.error || undefined,
-      images: task.status === 'completed' ? images : undefined,
+      images: task.status === 'completed' ? images.map(img => ({
+        resolution: img.resolution as '1024' | '800',
+        path: img.path,
+        md5: img.md5,
+        createdAt: img.createdAt,
+      })) : undefined,
     };
   }
 }

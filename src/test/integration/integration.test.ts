@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import pino from 'pino';
-import { createApp, AppConfig } from '../../app.js';
+import { createApp } from '../../app.js';
+import type { AppConfig } from '../../types/index.js';
 import { appConfig } from '../../config/index.js';
 import { mongoConnection } from '../../infra/mongo.js';
 

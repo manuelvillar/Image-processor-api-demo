@@ -1,13 +1,9 @@
 import mongoose from 'mongoose';
 import pino from 'pino';
 import { appConfig } from '../config/index.js';
+import type { MongoConnectionOptions } from '../types/index.js';
 
 const logger = pino({ name: 'mongo' });
-
-export interface MongoConnectionOptions {
-  maxRetries?: number;
-  retryDelay?: number;
-}
 
 export class MongoConnection {
   private static instance: MongoConnection;
@@ -23,7 +19,7 @@ export class MongoConnection {
     return MongoConnection.instance;
   }
 
-  public async connect(options: MongoConnectionOptions = {}): Promise<typeof mongoose> {
+  public async connect(options: Partial<MongoConnectionOptions> = {}): Promise<typeof mongoose> {
     if (this.isConnected) {
       logger.info('MongoDB already connected');
       return mongoose;

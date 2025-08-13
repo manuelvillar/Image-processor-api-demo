@@ -1,25 +1,5 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
-
-export interface ITask extends Document {
-  taskId: string;
-  status: 'pending' | 'completed' | 'failed';
-  price: number;
-  originalPath: string;
-  createdAt: Date;
-  updatedAt: Date;
-  completedAt?: Date;
-  error?: string;
-  images?: Array<{
-    resolution: string;
-    path: string;
-    md5: string;
-    createdAt: Date;
-  }>;
-}
-
-export interface ITaskModel extends Model<ITask> {
-  // Custom methods can be added here later
-}
+import mongoose, { Schema } from 'mongoose';
+import type { ITask, ITaskModel } from '../../types/index.js';
 
 const TaskSchema = new Schema<ITask>(
   {

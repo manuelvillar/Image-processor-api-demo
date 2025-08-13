@@ -1,11 +1,14 @@
 import { config } from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import pino from 'pino';
 
 // Load environment variables from .env file
 config();
 
-export interface AppConfig {
+import type { AppConfig as BaseAppConfig } from '../types/index.js';
+
+export interface AppConfig extends BaseAppConfig {
   // Server configuration
   port: number;
   nodeEnv: string;
@@ -62,6 +65,9 @@ export const appConfig: AppConfig = {
   
   // Logging configuration
   logLevel: getOptionalEnvVar('LOG_LEVEL', 'info'),
+  
+  // Logger instance
+  logger: pino({ level: getOptionalEnvVar('LOG_LEVEL', 'info') }),
 };
 
 // Validate configuration

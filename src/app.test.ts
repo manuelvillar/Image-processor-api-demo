@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { Express } from 'express';
-import { createApp, AppConfig } from './app.js';
+import { createApp } from './app.js';
+import type { AppConfig } from './types/index.js';
 import pino from 'pino';
 
 describe('App', () => {

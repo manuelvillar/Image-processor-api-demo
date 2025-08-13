@@ -2,13 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { appConfig } from '../../config/index.js';
 import { FileSystemError, ProcessingError } from '../../common/errors.js';
-
-export interface FileInfo {
-  path: string;
-  name: string;
-  size: number;
-  type: string;
-}
+import type { FileInfo } from '../../types/index.js';
 
 export class FileService {
   private readonly tempDir: string;
