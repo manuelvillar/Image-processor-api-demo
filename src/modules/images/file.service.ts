@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { appConfig } from '../../config/index.js';
 import { FileSystemError, ProcessingError } from '../../common/errors.js';
-import type { FileInfo } from '../../types/index.js';
+import type { FileInfo, UploadedFile } from '../../types/index.js';
 
 export class FileService {
   private readonly tempDir: string;
@@ -16,7 +16,7 @@ export class FileService {
   /**
    * Save uploaded file to temporary directory
    */
-  async saveUploadedFile(file: any): Promise<FileInfo> {
+  async saveUploadedFile(file: UploadedFile): Promise<FileInfo> {
     try {
       // Validate file type
       this.validateFileType(file.mimetype);
@@ -43,6 +43,73 @@ export class FileService {
     } catch (error) {
       throw new FileSystemError(
         `Failed to save uploaded file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Get file extension from MIME type
+   */
+  private getExtensionFromMimeType(mimeType: string): string {
+    const extensions: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    };
+    return extensions[mimeType] || 'jpg';
+  }
+
+  /**
+   * Save base64 encoded file to temporary directory
+   */
+  async saveBase64File(base64Data: string): Promise<FileInfo> {
+    try {
+      // Parse base64 data
+      const matches = base64Data.match(/^data:([^;]+);base64,(.+)$/);
+      if (!matches) {
+        throw new ProcessingError('Invalid base64 format. Expected data:image/type;base64,data');
+      }
+
+      const mimeType = matches[1];
+      const base64String = matches[2];
+      
+      if (!mimeType || !base64String) {
+        throw new ProcessingError('Invalid base64 format. Missing mime type or data');
+      }
+      
+      // Validate file type
+      this.validateFileType(mimeType);
+
+      // Decode base64 to buffer
+      const buffer = Buffer.from(base64String, 'base64');
+
+      // Validate file size
+      if (buffer.length > this.maxDownloadSize * 1024 * 1024) {
+        throw new ProcessingError(`File size exceeds maximum allowed size of ${this.maxDownloadSize}MB`);
+      }
+
+      // Generate unique filename
+      const extension = this.getExtensionFromMimeType(mimeType);
+      const filename = this.generateUniqueFilename(`uploaded-image.${extension}`);
+      const filePath = path.join(this.tempDir, filename);
+
+      // Ensure temp directory exists
+      await this.ensureDirectoryExists(this.tempDir);
+
+      // Write file
+      fs.writeFileSync(filePath, buffer);
+
+      return {
+        path: filePath,
+        name: filename,
+        size: buffer.length,
+        type: mimeType,
+      };
+    } catch (error) {
+      throw new FileSystemError(
+        `Failed to save base64 file: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

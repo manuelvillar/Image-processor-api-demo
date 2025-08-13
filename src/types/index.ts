@@ -1,5 +1,6 @@
 import type { Document, Model } from 'mongoose';
 import type { Logger } from 'pino';
+import type { Buffer } from 'node:buffer';
 
 // Application Configuration Types
 export interface AppConfig {
@@ -95,6 +96,13 @@ export interface FileInfo {
   name: string;
   size: number;
   type: string;
+}
+
+export interface UploadedFile {
+  buffer: Buffer;
+  originalname: string;
+  mimetype: string;
+  size: number;
 }
 
 

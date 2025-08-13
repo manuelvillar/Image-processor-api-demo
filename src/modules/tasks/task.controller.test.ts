@@ -3,12 +3,16 @@ import { Request, Response, NextFunction } from 'express';
 import { TaskController } from './task.controller.js';
 import { TaskService } from './task.service.js';
 
+
 // Mock the task service
 vi.mock('./task.service.js');
 
 describe('TaskController', () => {
   let controller: TaskController;
-  let mockTaskService: any;
+  let mockTaskService: {
+    createTask: ReturnType<typeof vi.fn>;
+    getTask: ReturnType<typeof vi.fn>;
+  };
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: NextFunction;
@@ -24,7 +28,7 @@ describe('TaskController', () => {
     };
 
     // Create controller instance
-    controller = new TaskController(mockTaskService as TaskService);
+    controller = new TaskController(mockTaskService as unknown as TaskService);
 
     // Create mock Express objects
     mockRequest = {

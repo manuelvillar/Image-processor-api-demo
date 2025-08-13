@@ -4,6 +4,12 @@ import { Task } from './task.model.js';
 import { Image } from '../images/image.model.js';
 import { NotFoundError } from '../../common/errors.js';
 
+
+// Safe type casting helper
+const asMock = <T>(obj: unknown): T => obj as T;
+
+
+
 // Mock dependencies
 vi.mock('./task.model.js');
 vi.mock('../images/image.model.js');
@@ -11,15 +17,48 @@ vi.mock('../images/image.service.js');
 vi.mock('../images/file.service.js');
 
 // Type-safe mock helpers
-const createMockTask = (overrides: Partial<any> = {}) => ({
+type MockTask = {
+  taskId: string;
+  status: 'pending' | 'completed' | 'failed';
+  price: number;
+  originalPath?: string | undefined;
+  error?: string | undefined;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date | undefined;
+  images?: Array<{
+    resolution: string;
+    path: string;
+    md5: string;
+    createdAt: Date;
+  }> | undefined;
+  save: ReturnType<typeof vi.fn>;
+};
+
+const createMockTask = (overrides: Partial<MockTask> = {}): MockTask => ({
   taskId: 'task_123',
   status: 'pending' as const,
   price: 25,
+  originalPath: undefined,
+  error: undefined,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  completedAt: undefined,
+  images: undefined,
   save: vi.fn().mockResolvedValue(true),
   ...overrides,
 });
 
-const createMockImage = (overrides: Partial<any> = {}) => ({
+type MockImage = {
+  taskId: string;
+  resolution: string;
+  path: string;
+  md5: string;
+  createdAt: Date;
+};
+
+const createMockImage = (overrides: Partial<MockImage> = {}): MockImage => ({
+  taskId: 'task_123',
   resolution: '1024',
   path: '/output/image/1024/abc123.jpg',
   md5: 'abc123def456',
@@ -35,7 +74,7 @@ describe('TaskService', () => {
   describe('createTask', () => {
     it('should generate task IDs with timestamp format', async () => {
       const mockTask = createMockTask();
-      (Task as any).mockImplementation(() => mockTask);
+      asMock<{ mockImplementation: (fn: () => MockTask) => void }>(Task).mockImplementation(() => mockTask);
 
       const request = { imageUrl: 'https://example.com/image.jpg' };
       const result = await taskService.createTask(request);
@@ -48,7 +87,7 @@ describe('TaskService', () => {
 
     it('should generate prices between 5 and 50', async () => {
       const mockTask = createMockTask();
-      (Task as any).mockImplementation(() => mockTask);
+      asMock<{ mockImplementation: (fn: () => MockTask) => void; mockImplementationOnce: (fn: () => MockTask) => void }>(Task).mockImplementation(() => mockTask);
 
       const request = { imageUrl: 'https://example.com/image.jpg' };
       const result = await taskService.createTask(request);
@@ -61,8 +100,8 @@ describe('TaskService', () => {
     it('should generate unique task IDs for different requests', async () => {
       const mockTask1 = createMockTask({ taskId: 'task_123' });
       const mockTask2 = createMockTask({ taskId: 'task_456' });
-      (Task as any).mockImplementationOnce(() => mockTask1);
-      (Task as any).mockImplementationOnce(() => mockTask2);
+      asMock<{ mockImplementation: (fn: () => MockTask) => void; mockImplementationOnce: (fn: () => MockTask) => void }>(Task).mockImplementationOnce(() => mockTask1);
+      asMock<{ mockImplementation: (fn: () => MockTask) => void; mockImplementationOnce: (fn: () => MockTask) => void }>(Task).mockImplementationOnce(() => mockTask2);
 
       const request = { imageUrl: 'https://example.com/image.jpg' };
       
@@ -93,7 +132,7 @@ describe('TaskService', () => {
       const mockTask = createMockTask();
       mockTask.save.mockRejectedValue(new Error('Database error'));
       
-      (Task as any).mockImplementation(() => mockTask);
+      asMock<{ mockImplementation: (fn: () => MockTask) => void; mockImplementationOnce: (fn: () => MockTask) => void }>(Task).mockImplementation(() => mockTask);
       
       await expect(taskService.createTask(request)).rejects.toThrow('Failed to create task: Database error');
     });
@@ -110,11 +149,11 @@ describe('TaskService', () => {
         error: undefined,
       });
 
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockTask),
       });
 
-      (Image.find as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockImage[]> }) => void }>(Image.find).mockReturnValue({
         exec: vi.fn().mockResolvedValue([]),
       });
 
@@ -153,11 +192,11 @@ describe('TaskService', () => {
         }),
       ];
 
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockTask),
       });
 
-      (Image.find as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockImage[]> }) => void }>(Image.find).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockImages),
       });
 
@@ -182,7 +221,7 @@ describe('TaskService', () => {
         updatedAt: new Date(),
       });
 
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockTask),
       });
 
@@ -202,7 +241,7 @@ describe('TaskService', () => {
         error: 'Processing failed',
       });
 
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockTask),
       });
 
@@ -215,7 +254,7 @@ describe('TaskService', () => {
     });
 
     it('should throw NotFoundError for non-existent task', async () => {
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(null),
       });
 
@@ -224,7 +263,7 @@ describe('TaskService', () => {
     });
 
     it('should handle database query errors', async () => {
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockRejectedValue(new Error('Database connection error')),
       });
 
@@ -241,7 +280,7 @@ describe('TaskService', () => {
         error: undefined,
       });
 
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockTask),
       });
 
@@ -261,7 +300,7 @@ describe('TaskService', () => {
         completedAt: new Date('2024-01-01T10:05:00Z'),
       });
 
-      (Task.findOne as any).mockReturnValue({
+      asMock<{ mockReturnValue: (obj: { exec: () => Promise<MockTask> }) => void }>(Task.findOne).mockReturnValue({
         exec: vi.fn().mockResolvedValue(mockTask),
       });
 
@@ -277,10 +316,10 @@ describe('TaskService', () => {
     it('should validate request data structure', async () => {
       // Test that the service properly validates the request structure
       const validRequest = { imageUrl: 'https://example.com/image.jpg' };
-      const invalidRequest = { invalidField: 'test' } as any;
+      const invalidRequest = { invalidField: 'test' } as unknown as Record<string, unknown>;
 
       const mockTask = createMockTask();
-      (Task as any).mockImplementation(() => mockTask);
+      asMock<{ mockImplementation: (fn: () => MockTask) => void; mockImplementationOnce: (fn: () => MockTask) => void }>(Task).mockImplementation(() => mockTask);
 
       // Valid request should work
       const validResult = await taskService.createTask(validRequest);

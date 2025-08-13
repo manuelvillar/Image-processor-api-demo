@@ -87,7 +87,7 @@ export class TaskService {
 
       // Handle file upload or URL download
       if (request.imageFile) {
-        const fileInfo = await fileService.saveUploadedFile(request.imageFile);
+        const fileInfo = await fileService.saveBase64File(request.imageFile);
         sourcePath = fileInfo.path;
         originalName = fileInfo.name;
       } else if (request.imageUrl) {
@@ -130,7 +130,7 @@ export class TaskService {
       if (request.imageFile || request.imageUrl) {
         try {
           const fileInfo = request.imageFile 
-            ? await fileService.saveUploadedFile(request.imageFile)
+            ? await fileService.saveBase64File(request.imageFile)
             : await fileService.downloadFromUrl(request.imageUrl!);
           await fileService.cleanupTempFile(fileInfo.path);
         } catch (cleanupError) {
