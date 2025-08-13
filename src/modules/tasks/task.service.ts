@@ -3,7 +3,8 @@ import { Image } from '../images/image.model.js';
 import { imageService } from '../images/image.service.js';
 import { fileService } from '../images/file.service.js';
 import { NotFoundError, ProcessingError, ValidationError } from '../../common/errors.js';
-import type { CreateTaskRequest, TaskResult, ITask, IImage } from '../../types/index.js';
+import type { CreateTaskRequest, TaskResult, ITask } from './task.types.js';
+import type { IImage } from '../images/image.types.js';
 
 export class TaskService {
   /**

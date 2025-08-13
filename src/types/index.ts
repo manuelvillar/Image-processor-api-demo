@@ -1,14 +1,12 @@
-import type { Document, Model } from 'mongoose';
 import type { Logger } from 'pino';
-import type { Buffer } from 'node:buffer';
 
-// Application Configuration Types
+// Application Configuration Types (used across app, server, config, tests)
 export interface AppConfig {
   port: number;
   logger: Logger;
 }
 
-// MongoDB Connection Types
+// MongoDB Connection Types (used in infra and potentially other places)
 export interface MongoConnectionOptions {
   uri: string;
   dbName: string;
@@ -16,98 +14,9 @@ export interface MongoConnectionOptions {
   retryDelay?: number;
 }
 
-// Database Model Types
-export interface ITask extends Document {
-  taskId: string;
-  status: 'pending' | 'completed' | 'failed';
-  price: number;
-  originalPath?: string;
-  error?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  completedAt?: Date;
-  images?: Array<{
-    resolution: string;
-    path: string;
-    md5: string;
-    createdAt: Date;
-  }>;
-}
-
-export interface ITaskModel extends Model<ITask> {
-  findByTaskId(taskId: string): Promise<ITask | null>;
-}
-
-export interface IImage extends Document {
-  taskId: string;
-  resolution: string;
-  path: string;
-  md5: string;
-  createdAt: Date;
-}
-
-export interface IImageModel extends Model<IImage> {
-  findByTaskId(taskId: string): Promise<IImage[]>;
-}
-
-// Request/Response Types
-export interface CreateTaskRequest {
-  imageUrl?: string | undefined;
-  imageFile?: string | undefined;
-}
-
-export interface TaskResult {
-  taskId: string;
-  status: 'pending' | 'completed' | 'failed';
-  price: number;
-  originalPath?: string | undefined;
-  error?: string | undefined;
-  createdAt: Date;
-  updatedAt: Date;
-  completedAt?: Date | undefined;
-  images?: ImageResult[] | undefined;
-}
-
-export interface ImageResult {
-  resolution: '1024' | '800';
-  path: string;
-  md5: string;
-  createdAt: Date;
-}
-
-// Image Processing Types
-export interface ImageProcessingOptions {
-  width: number;
-  quality?: number;
-  format?: 'jpeg' | 'png' | 'webp';
-}
-
-export interface ProcessedImage {
-  resolution: string;
-  path: string;
-  md5: string;
-  size: number;
-  width: number;
-  height: number;
-}
-
-export interface FileInfo {
-  path: string;
-  name: string;
-  size: number;
-  type: string;
-}
-
-export interface UploadedFile {
-  buffer: Buffer;
-  originalname: string;
-  mimetype: string;
-  size: number;
-}
 
 
-
-// Validation Schema Types (from Zod)
+// Validation Schema Types (from Zod) - used in validation and potentially other places
 export type CreateTaskRequestSchema = import('zod').z.infer<typeof import('../common/validation.js').CreateTaskRequestSchema>;
 export type GetTaskResponseSchema = import('zod').z.infer<typeof import('../common/validation.js').GetTaskResponseSchema>;
 export type ImageSchema = import('zod').z.infer<typeof import('../common/validation.js').ImageSchema>;

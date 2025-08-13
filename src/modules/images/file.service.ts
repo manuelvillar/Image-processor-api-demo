@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { appConfig } from '../../config/index.js';
 import { FileSystemError, ProcessingError } from '../../common/errors.js';
-import type { FileInfo, UploadedFile } from '../../types/index.js';
+import type { FileInfo, UploadedFile } from './image.types.js';
 
 export class FileService {
   private readonly tempDir: string;

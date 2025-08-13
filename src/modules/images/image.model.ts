@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import type { IImage, IImageModel } from '../../types/index.js';
+import type { IImage, IImageModel } from './image.types.js';
 
 const ImageSchema = new Schema<IImage>(
   {

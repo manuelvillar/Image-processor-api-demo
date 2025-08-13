@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { appConfig } from '../../config/index.js';
 import { FileSystemError, ProcessingError } from '../../common/errors.js';
-import type { ProcessedImage } from '../../types/index.js';
+import type { ProcessedImage } from './image.types.js';
 
 export class ImageService {
   private readonly outputDir: string;
